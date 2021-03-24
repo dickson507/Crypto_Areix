@@ -1,0 +1,61 @@
+,value
+start,2020-12-01 00:00:00+08:00
+end,2021-03-12 00:00:00+08:00
+duration,101 days 00:00:00
+beginning_balance,200000
+ending_balance,401903.976915
+total_net_profit,201903.976915
+gross_profit,307614.92769499973
+gross_loss,-105710.95077999975
+profit_factor,2.909962737306112
+return_on_initial_capital,1.009519884575
+annualized_return,0.3360747115645548
+total_return,1.009519884575
+max_return,1.009519884575
+min_return,0.0
+number_trades,185
+number_winning_trades,53
+number_losing_trades,42
+avg_daily_trades,5.606060606060606
+avg_weekly_trades,26.428571428571427
+avg_monthly_trades,61.666666666666664
+win_ratio,0.2864864864864865
+loss_ratio,0.22702702702702704
+win_days,30
+loss_days,9
+max_win_in_day,22655.999775
+max_loss_in_day,-2397.489768
+max_consecutive_win_days,55
+max_consecutive_loss_days,3
+avg_profit_per_trade,2989.7244968729738
+trading_period,0 years 3 months 11 days
+avg_daily_pnl($),333.1748793976898
+avg_daily_pnl,0.0011763612856088772
+avg_weekly_pnl($),14421.712636785714
+avg_weekly_pnl,0.05360305031623732
+avg_monthly_pnl($),67301.32563833334
+avg_monthly_pnl,0.27410831335828106
+avg_quarterly_pnl($),201903.976915
+avg_quarterly_pnl,1.009519884575
+avg_annualy_pnl($),201903.976915
+avg_annualy_pnl,1.009519884575
+sharpe_ratio,2.270222453933083
+sortino_ratio,7.753066859169278
+annualized_volatility,0.11120118329818024
+omega_ratio,0.0008884477698481516
+downside_risk,0.03823558462195439
+information_ratio,-0.03621171412041571
+beta,-0.02166699060478784
+alpha,-0.9999879066386457
+calmar_ratio,10.806091633642417
+tail_ratio,3.4284349178344575
+stability_of_timeseries,0.823199625555963
+max_drawdown,0.031100486925194976
+max_drawdown_period,"(Timestamp('2021-02-13 00:00:00+0800', tz='Asia/Shanghai'), Timestamp('2021-02-13 16:00:00+0800', tz='Asia/Shanghai'))"
+max_drawdown_duration,0 days 16:00:00
+sqn,4.722520229955536
+model_name,Simple KNN Signal Generation Strategy
+algorithm,"['KNN', 'Simple Moving Average', 'Bollinger Band']"
+model_measures,"['f1-score', 'accuracy']"
+f1-score,0.46896276670053555
+accuracy,0.4934640522875817
