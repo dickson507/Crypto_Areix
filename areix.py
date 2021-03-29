@@ -134,13 +134,13 @@ class MLStrategy(aio.Strategy):
         upper, lower = close * (1 + np.r_[1, -1]*PCT_CHANGE)
 
         if forecast == 1 and not self.ctx.get_position(self.code):
-            o1 = self.order_amount(code=self.code,amount=200000,side=SideType.BUY, asset_type='Crypto')
+            o1 = self.order_amount(code=self.code,amount=55800,side=SideType.BUY, asset_type='Crypto')
             self.info(f"BUY order {o1['id']} created #{o1['quantity']} @ {close:2f}")
             osl = self.sell(code=self.code,quantity=o1['quantity'], price=lower, stop_price=lower, asset_type='Crypto')
             self.info(f"STOPLOSS order {osl['id']} created #{osl['quantity']} @ {lower:2f}")
             
         elif forecast == -1 and self.ctx.get_position(self.code):
-            o2 = self.order_amount(code=self.code,amount=200000,side=SideType.SELL, price=upper, asset_type='Crypto',ioc=True)
+            o2 = self.order_amount(code=self.code,amount=55800,side=SideType.SELL, price=upper, asset_type='Crypto',ioc=True)
             self.info(f"SELL order {o2['id']} created #{o2['quantity']} @ {close:2f}")
 
 if __name__ == '__main__':
@@ -169,26 +169,26 @@ if __name__ == '__main__':
         min_commission=0, 
         trade_at='close', 
         benchmark=benchmark, 
-        cash=200000, 
+        cash=55800, 
         tradedays=idx, 
         store_path=base
     )
 
     mytest.start()
 
-    prefix = ''
-    stats = mytest.ctx.statistic.stats(pprint=True, annualization=252, risk_free=0.0442)
-    '''
-    Model evaluation step
-    '''
-    stats['model_name'] = 'Simple KNN Signal Generation Strategy'
-    stats['algorithm'] = ['KNN', 'Simple Moving Average', 'Bollinger Band']
-    stats['model_measures'] = ['f1-score','accuracy']
-    ytrue = mytest.ctx.strategy.y_true[:-PRED_DAYS]
-    ypred = mytest.ctx.strategy.y_pred[:-PRED_DAYS]
-    # print(len(ytrue),len(ypred), ytrue, ypred)
-    stats['f1-score'] = f1_score(ytrue, ypred,average='weighted')
-    stats['accuracy'] = accuracy_score(ytrue, ypred)
-    print(stats)
+    # prefix = ''
+    # stats = mytest.ctx.statistic.stats(pprint=True, annualization=252, risk_free=0.0442)
+    # '''
+    # Model evaluation step
+    # '''
+    # stats['model_name'] = 'Simple KNN Signal Generation Strategy'
+    # stats['algorithm'] = ['KNN', 'Simple Moving Average', 'Bollinger Band']
+    # stats['model_measures'] = ['f1-score','accuracy']
+    # ytrue = mytest.ctx.strategy.y_true[:-PRED_DAYS]
+    # ypred = mytest.ctx.strategy.y_pred[:-PRED_DAYS]
+    # # print(len(ytrue),len(ypred), ytrue, ypred)
+    # stats['f1-score'] = f1_score(ytrue, ypred,average='weighted')
+    # stats['accuracy'] = accuracy_score(ytrue, ypred)
+    # print(stats)
 
-    mytest.contest_output()
+    # mytest.contest_output()
