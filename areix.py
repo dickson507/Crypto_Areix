@@ -6,9 +6,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, f1_score
 import pandas as pd
 import numpy as np
+import math
+
+from candlestick import det_candlestick_pattern
 
 PRED_DAYS = 2 
-PCT_CHANGE = 0.004
+PCT_CHANGE = 0.04
+MACD_RATIO = 48
 '''
 Data pre processing step
 '''
@@ -20,26 +24,36 @@ def bollinger_band(data, n_lookback, n_std):
     return upper, lower
 
 def update_df(df):
-    upper, lower = bollinger_band(df, 20, 2)
+    # upper, lower = bollinger_band(df, 20, 2)
 
-    df['ma10'] = df.close.rolling(10).mean()
-    df['ma20'] = df.close.rolling(20).mean()
-    df['ma50'] = df.close.rolling(50).mean()
-    df['ma100'] = df.close.rolling(100).mean()
+    # df['ma10'] = df.close.rolling(10).mean()
+    # df['ma20'] = df.close.rolling(20).mean()
+    # df['ma50'] = df.close.rolling(50).mean()
+    # df['ma100'] = df.close.rolling(100).mean()
 
-    df['x_ma10'] = (df.close - df.ma10) / df.close
-    df['x_ma20'] = (df.close - df.ma20) / df.close
-    df['x_ma50'] = (df.close - df.ma50) / df.close
-    df['x_ma100'] = (df.close - df.ma100) / df.close
+    # df['x_ma10'] = (df.close - df.ma10) / df.close
+    # df['x_ma20'] = (df.close - df.ma20) / df.close
+    # df['x_ma50'] = (df.close - df.ma50) / df.close
+    # df['x_ma100'] = (df.close - df.ma100) / df.close
 
-    df['x_delta_10'] = (df.ma10 - df.ma20) / df.close
-    df['x_delta_20'] = (df.ma20 - df.ma50) / df.close
-    df['x_delta_50'] = (df.ma50 - df.ma100) / df.close
+    # df['x_delta_10'] = (df.ma10 - df.ma20) / df.close
+    # df['x_delta_20'] = (df.ma20 - df.ma50) / df.close
+    # df['x_delta_50'] = (df.ma50 - df.ma100) / df.close
 
-    df['x_mom'] = df.close.pct_change(periods=2)
-    df['x_bb_upper'] = (upper - df.close) / df.close
-    df['x_bb_lower'] = (lower - df.close) / df.close
-    df['x_bb_width'] = (upper - lower) / df.close
+    # df['x_mom'] = df.close.pct_change(periods=2)
+    # df['x_bb_upper'] = (upper - df.close) / df.close
+    # df['x_bb_lower'] = (lower - df.close) / df.close
+    # df['x_bb_width'] = (upper - lower) / df.close
+
+    df['ma12'] = df.close.rolling(12*MACD_RATIO).mean()
+    df['ma26'] = df.close.rolling(26*MACD_RATIO).mean()
+    df['dif'] = df.ma12 - df.ma26
+    df['trend'] = [np.nan if np.isnan(dif) else 'UPWARD' if (dif > 0) else 'DOWNWARD' for dif in df['dif']]
+
+    df['bodyBottom'] = [x if (x > y) else y for x, y in zip(df['open'],df['close'])]
+    df['bodyTop'] = [y if (x > y) else x for x, y in zip(df['open'],df['close'])]
+    df['shadowBottom'] = abs(df.low - df.bodyBottom)
+    df['shadowTop'] = abs(df.high - df.bodyTop)
     return df
 
 def get_X(data):
@@ -63,7 +77,7 @@ def get_clean_Xy(df):
     return X, y
 
 class MLStrategy(aio.Strategy):
-    num_pre_train = 300
+    num_pre_train = 26*MACD_RATIO
 
     def initialize(self):
         '''
@@ -78,11 +92,11 @@ class MLStrategy(aio.Strategy):
         self.y = get_y(df[self.num_pre_train-1:])
         self.y_true = self.y.values
 
-        self.clf = KNeighborsClassifier(7)
+        # self.clf = KNeighborsClassifier(7)
         
-        tmp = df.dropna().astype(float)
-        X, y = get_clean_Xy(tmp[:self.num_pre_train])
-        self.clf.fit(X, y)
+        # tmp = df.dropna().astype(float)
+        # X, y = get_clean_Xy(tmp[:self.num_pre_train])
+        # self.clf.fit(X, y)
 
         self.y_pred = []
     
@@ -119,76 +133,42 @@ class MLStrategy(aio.Strategy):
         bar_data = self.ctx.bar_data[self.code]
         hist_data = self.ctx.hist_data[self.code]
 
-        if len(hist_data) < self.num_pre_train:
+        bar_number = len(hist_data)
+
+        if bar_number < self.num_pre_train:
             return 
         
-        open, high, low, close = bar_data.open, bar_data.high, bar_data.low, bar_data.close
-        X = get_X(bar_data)
-        forecast = self.clf.predict([X])[0]
-        self.y_pred.append(forecast)
+        prepre_data = hist_data[bar_number-3]
+        pre_data = hist_data[bar_number-2]
 
-        self.ctx.cplot(forecast,'Forcast')
-        self.ctx.cplot(self.y[tick],'Groundtruth')
-        # self.info(f"focasing result: {forecast}")
+        predict = det_candlestick_pattern(prepre_data, pre_data, bar_data)
 
+        # open, high, low, close = bar_data.open, bar_data.high, bar_data.low, bar_data.close
+        # X = get_X(bar_data)
+        # forecast = self.clf.predict([X])[0]
+        # self.y_pred.append(forecast)
+
+        # self.ctx.cplot(forecast,'Forcast')
+        # self.ctx.cplot(self.y[tick],'Groundtruth')
+        # # self.info(f"focasing result: {forecast}")
+
+        close = bar_data.close
         upper, lower = close * (1 + np.r_[1, -1]*PCT_CHANGE)
 
-        if forecast == 1 and not self.ctx.get_position(self.code):
-            o1 = self.order_amount(code=self.code,amount=55800,side=SideType.BUY, asset_type='Crypto')
+        cash = self.ctx.available_cash
+
+        # if forecast == 1 and not self.ctx.get_position(self.code):
+        if predict == 'BULL' and not self.ctx.get_position(self.code):
+            amount = cash if (cash < 55800) else 55800
+            o1 = self.order_amount(code=self.code,amount=amount,side=SideType.BUY, asset_type='Crypto')
             self.info(f"BUY order {o1['id']} created #{o1['quantity']} @ {close:2f}")
-            osl = self.sell(code=self.code,quantity=o1['quantity'], price=lower, stop_price=lower, asset_type='Crypto')
+            osl = self.sell(code=self.code,quantity=o1['quantity'], stop_price=lower, asset_type='Crypto')
             self.info(f"STOPLOSS order {osl['id']} created #{osl['quantity']} @ {lower:2f}")
+            # os2 = self.sell(code=self.code,quantity=o1['quantity'], price=upper, asset_type='Crypto')
+            # self.info(f"STOPGAIN order {os2['id']} created #{os2['quantity']} @ {upper:2f}")
             
-        elif forecast == -1 and self.ctx.get_position(self.code):
-            o2 = self.order_amount(code=self.code,amount=55800,side=SideType.SELL, price=upper, asset_type='Crypto',ioc=True)
+        # elif forecast == -1 and self.ctx.get_position(self.code):
+        elif predict == 'BEAR' and self.ctx.get_position(self.code):
+            quantity = self.ctx.get_position(self.code)['quantity']
+            o2 = self.sell(code=self.code, quantity=quantity, price=close, ioc=True, asset_type='Crypto')
             self.info(f"SELL order {o2['id']} created #{o2['quantity']} @ {close:2f}")
-
-if __name__ == '__main__':
-    aio.set_token('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDMyMDUxMTQsImlhdCI6MTYxMjEwMTA1NCwic3ViIjoiZjQzZyAzNWc1dzRoNXc0aCB3NDVoNXc0aHc0NWhqNXdqamh3NTRnIHc0NSBnNXc0ICJ9.CLavu4bIpl64So0F0nYl6g3NfmXqopLfS_UC-9wOgrA') # Only need to run once
-
-    base = create_report_folder()
-
-    start_date = '2020-12-01'
-    end_date = '2021-03-12'
-
-    sdf = aio.CryptoDataFeed(
-        symbols=['XRP/USDT', 'BTC/USDT'], 
-        start_date=start_date, 
-        end_date=end_date,  
-        interval='4h', 
-        order_ascending=True, 
-        store_path=base
-    )
-    feed, idx = sdf.fetch_data()
-    benchmark = feed.pop('BTC/USDT')
-
-    mytest = aio.BackTest(
-        feed, 
-        MLStrategy, 
-        commission_rate=0.001, 
-        min_commission=0, 
-        trade_at='close', 
-        benchmark=benchmark, 
-        cash=55800, 
-        tradedays=idx, 
-        store_path=base
-    )
-
-    mytest.start()
-
-    # prefix = ''
-    # stats = mytest.ctx.statistic.stats(pprint=True, annualization=252, risk_free=0.0442)
-    # '''
-    # Model evaluation step
-    # '''
-    # stats['model_name'] = 'Simple KNN Signal Generation Strategy'
-    # stats['algorithm'] = ['KNN', 'Simple Moving Average', 'Bollinger Band']
-    # stats['model_measures'] = ['f1-score','accuracy']
-    # ytrue = mytest.ctx.strategy.y_true[:-PRED_DAYS]
-    # ypred = mytest.ctx.strategy.y_pred[:-PRED_DAYS]
-    # # print(len(ytrue),len(ypred), ytrue, ypred)
-    # stats['f1-score'] = f1_score(ytrue, ypred,average='weighted')
-    # stats['accuracy'] = accuracy_score(ytrue, ypred)
-    # print(stats)
-
-    # mytest.contest_output()

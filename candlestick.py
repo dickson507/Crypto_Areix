@@ -1,5 +1,6 @@
 import math
 
+# 10 well-known candlestick pattern recognition
 def isBullishHarami(trend, pre_open, pre_close, pre_low, pre_high, 
                     cur_open, cur_close):
     if (trend == 'DOWNWARD'):
@@ -125,3 +126,60 @@ def isEveningStar(trend, prepre_open, prepre_close, prepre_low, prepre_high,
                                                     if (pre_low > cur_close):
                                                         return True
     return False
+
+def det_candlestick_pattern(prepre_data, pre_data, cur_data):
+
+    # initialize variable
+    trend = cur_data.trend
+
+    prepre_open = prepre_data.open
+    prepre_close = prepre_data.close
+    prepre_low = prepre_data.low
+    prepre_high = prepre_data.high
+
+    pre_open = pre_data.open
+    pre_close = pre_data.close
+    pre_low = pre_data.low
+    pre_high = pre_data.high
+    pre_bodyBottom = pre_data.bodyBottom
+    pre_bodyTop = pre_data.bodyTop
+
+    cur_open = cur_data.open
+    cur_close = cur_data.close
+    cur_low = cur_data.low
+    cur_high = cur_data.high
+    cur_bodyBottom = cur_data.bodyBottom
+    cur_bodyTop = cur_data.bodyTop
+    cur_shadowBottom = cur_data.shadowBottom
+    cur_shadowTop = cur_data.shadowTop
+
+    # determine if it is a Bullish market
+    if (isBullishHarami(trend, pre_open, pre_close, pre_low, pre_high, 
+                    cur_open, cur_close) or
+        isBullishEngulfing(trend, pre_open, pre_close, 
+                    cur_open, cur_close, cur_low, cur_high) or
+        isBullishDoji(trend, pre_open, pre_close, pre_low, pre_high, 
+                    cur_open, cur_close, cur_low, cur_high) or
+        isHammer(trend, pre_open, pre_close, pre_low, pre_high,
+                    cur_open, cur_close, cur_low, cur_high, cur_bodyBottom, cur_bodyTop) or
+        isMorningStar(trend, prepre_open, prepre_close, prepre_low, prepre_high,
+                    pre_open, pre_close, pre_low, pre_high, 
+                    cur_open, cur_close, cur_low, cur_high)):
+        return 'BULL'
+    
+    # determine if it is a Bearish market
+    if (isBearishHarami(trend, pre_open, pre_close, pre_low, pre_high, 
+                    cur_open, cur_close) or
+        isBearishEngulfing(trend, pre_open, pre_close, pre_bodyBottom, pre_bodyTop,
+                    cur_open, cur_close, cur_low, cur_high, cur_bodyBottom, cur_bodyTop) or
+        isGravestoneDoji(trend, pre_open, pre_close, pre_low, pre_high, 
+                    cur_open, cur_close, cur_low, cur_high) or
+        isHangingMan(trend, pre_open, pre_close, pre_low, pre_high, 
+                    cur_high, cur_shadowBottom, cur_shadowTop) or
+        isEveningStar(trend, prepre_open, prepre_close, prepre_low, prepre_high,
+                    pre_open, pre_close, pre_low, pre_high, 
+                    cur_open, cur_close, cur_low, cur_high)):
+        return 'BEAR'
+
+    # unable to determine pattern
+    return 'UNDETERMINE'
