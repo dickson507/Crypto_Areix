@@ -1,0 +1,58 @@
+,value
+start,2020-03-01 00:00:00+08:00
+end,2021-03-12 00:00:00+08:00
+duration,376 days 00:00:00
+beginning_balance,55800
+ending_balance,96836.44282999999
+total_net_profit,41036.442829999985
+gross_profit,1004855.0606779999
+gross_loss,-963818.6178479999
+profit_factor,1.0425769351930818
+return_on_initial_capital,0.7354201224014334
+annualized_return,0.007740011767902066
+total_return,0.7354201224014334
+max_return,0.8138711062007168
+min_return,-0.5085822013799283
+number_trades,15
+number_winning_trades,5
+number_losing_trades,2
+avg_daily_trades,0.06198347107438017
+avg_weekly_trades,0.3
+avg_monthly_trades,1.1538461538461537
+win_ratio,0.3333333333333333
+loss_ratio,0.13333333333333333
+win_days,83
+loss_days,76
+max_win_in_day,18493.247278
+max_loss_in_day,-20177.86895
+max_consecutive_win_days,48
+max_consecutive_loss_days,6
+avg_profit_per_trade,4780.997249000001
+trading_period,1 years 0 months 11 days
+avg_daily_pnl($),2.277777688166074
+avg_daily_pnl,5.2380099844112785e-05
+avg_weekly_pnl($),759.9341264814813
+avg_weekly_pnl,0.020306297601956
+avg_monthly_pnl($),3284.844736083332
+avg_monthly_pnl,0.09442279256514942
+avg_quarterly_pnl($),9854.534208249996
+avg_quarterly_pnl,0.39269572801862573
+avg_annualy_pnl($),65009.564436999986
+avg_annualy_pnl,2.0425994542806998
+sharpe_ratio,-0.294116566582789
+sortino_ratio,0.19063264021643675
+annualized_volatility,0.10540404298748118
+omega_ratio,0.0014561721337215876
+downside_risk,0.06924199940644954
+information_ratio,-0.009054159379193643
+beta,0.23493100173099418
+alpha,-0.9998271632505601
+calmar_ratio,0.01147510336700811
+tail_ratio,1.0160299691815071
+stability_of_timeseries,0.0335333148334978
+max_drawdown,0.6745047534957509
+max_drawdown_period,"(Timestamp('2020-12-18 00:30:00+0800', tz='pytz.FixedOffset(480)'), Timestamp('2020-12-29 23:30:00+0800', tz='pytz.FixedOffset(480)'))"
+max_drawdown_duration,11 days 23:00:00
+sqn,0.8626435887324472
+model_name,MACD Trend prediction & Candlestick pattern trading
+algorithm,"['MACD', 'Candlestick pattern']"
