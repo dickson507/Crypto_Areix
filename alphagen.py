@@ -196,7 +196,7 @@ class MLStrategy(aio.Strategy):
         if (((predict == 'BULL')
         or (rsi >= 0.65)) 
         and not self.ctx.get_position(self.code)):
-            amount = cash if (cash < 55800) else 55800
+            amount = cash # if (cash < 55800) else 55800
             o1 = self.order_amount(code=self.code,amount=amount,side=SideType.BUY, asset_type='Crypto')
             self.info(f"BUY order {o1['id']} created #{o1['quantity']} @ {close:2f}")
             osl = self.sell(code=self.code,quantity=o1['quantity'], stop_price=lower, asset_type='Crypto')
