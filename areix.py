@@ -1,9 +1,6 @@
 import areix_io as aio
 from areix_io.utils import create_report_folder, SideType
 
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, f1_score
 import pandas as pd
 import numpy as np
 import math
@@ -12,7 +9,7 @@ from candlestick import det_candlestick_pattern
 
 PRED_DAYS = 2 
 PCT_CHANGE = 0.04
-MACD_RATIO = 48
+INTERVAL_TO_DAY = 48
 '''
 Data pre processing step
 '''
@@ -23,37 +20,77 @@ def bollinger_band(data, n_lookback, n_std):
     lower = mean - n_std*std
     return upper, lower
 
+def find_rsi_UD(df):
+    U = []
+    D = []
+    for i in range(0, len(df.index)):
+        dif = df['close'].iloc[i] - df['close'].iloc[i-1]
+        if (i == 0 or dif == 0):
+            U.append(0)
+            D.append(0)
+        elif (dif > 0):
+            U.append(dif)
+            D.append(0)
+        else:
+            U.append(0)
+            D.append(abs(dif))
+    return U, D
+
+def parabolic_sar(df):
+    alpha = 0.2
+    sar = []
+    trend = []
+    for i in range(0, len(df.index)):
+        if (i == 0):
+            sar.append(df['high'].iloc[i])
+            trend.append('DOWNWARD')
+            continue
+       
+        if (trend[i-1] == 'DOWNWARD'):
+            sar.append(sar[i-1] - alpha*(sar[i-1] - df['high'].iloc[i-1]))
+            trend.append('DOWNWARD')
+        elif (trend[i-1] == 'UPWARD'):
+            sar.append(sar[i-1] + alpha*(df['low'].iloc[i-1] - sar[i-1]))
+            trend.append('UPWARD')
+
+        if (df['close'].iloc[i] > sar[i]):
+            sar[i] = df['low'].iloc[i]
+            trend[i] = 'UPWARD'
+            if (alpha < 0.2):
+                alpha += 0.02
+        elif (df['close'].iloc[i] < sar[i]):
+            sar[i] = df['high'].iloc[i]
+            trend[i] = 'DOWNWARD'
+            if (alpha < 0.2):
+                alpha += 0.02
+    return sar, trend
+
 def update_df(df):
-    # upper, lower = bollinger_band(df, 20, 2)
 
-    # df['ma10'] = df.close.rolling(10).mean()
-    # df['ma20'] = df.close.rolling(20).mean()
-    # df['ma50'] = df.close.rolling(50).mean()
-    # df['ma100'] = df.close.rolling(100).mean()
+    # construct bollinger_band
+    upper, lower = bollinger_band(df, 20, 2)
+    df['bb_upper'] = upper
+    df['bb_lower'] = lower
 
-    # df['x_ma10'] = (df.close - df.ma10) / df.close
-    # df['x_ma20'] = (df.close - df.ma20) / df.close
-    # df['x_ma50'] = (df.close - df.ma50) / df.close
-    # df['x_ma100'] = (df.close - df.ma100) / df.close
+    # calculate RSI value
+    U, D = find_rsi_UD(df)
+    df['U'] = U
+    df['D'] = D
+    df['U_ma14'] = df.U.rolling(14).mean()
+    df['D_ma14'] = df.D.rolling(14).mean()
+    df['rsi'] = df.U_ma14 / (df.U_ma14 + df.D_ma14)
 
-    # df['x_delta_10'] = (df.ma10 - df.ma20) / df.close
-    # df['x_delta_20'] = (df.ma20 - df.ma50) / df.close
-    # df['x_delta_50'] = (df.ma50 - df.ma100) / df.close
+    # find Parabolic SAR value and Predict Trend
+    sar, trend = parabolic_sar(df)
+    df['sar'] = sar
+    df['trend'] = trend
 
-    # df['x_mom'] = df.close.pct_change(periods=2)
-    # df['x_bb_upper'] = (upper - df.close) / df.close
-    # df['x_bb_lower'] = (lower - df.close) / df.close
-    # df['x_bb_width'] = (upper - lower) / df.close
-
-    df['ma12'] = df.close.rolling(12*MACD_RATIO).mean()
-    df['ma26'] = df.close.rolling(26*MACD_RATIO).mean()
-    df['dif'] = df.ma12 - df.ma26
-    df['trend'] = [np.nan if np.isnan(dif) else 'UPWARD' if (dif > 0) else 'DOWNWARD' for dif in df['dif']]
-
+    # construct candlestick element
     df['bodyBottom'] = [x if (x > y) else y for x, y in zip(df['open'],df['close'])]
     df['bodyTop'] = [y if (x > y) else x for x, y in zip(df['open'],df['close'])]
     df['shadowBottom'] = abs(df.low - df.bodyBottom)
     df['shadowTop'] = abs(df.high - df.bodyTop)
+
     return df
 
 def get_X(data):
@@ -77,7 +114,7 @@ def get_clean_Xy(df):
     return X, y
 
 class MLStrategy(aio.Strategy):
-    num_pre_train = 26*MACD_RATIO
+    num_pre_train = 30*INTERVAL_TO_DAY
 
     def initialize(self):
         '''
@@ -91,12 +128,6 @@ class MLStrategy(aio.Strategy):
 
         self.y = get_y(df[self.num_pre_train-1:])
         self.y_true = self.y.values
-
-        # self.clf = KNeighborsClassifier(7)
-        
-        # tmp = df.dropna().astype(float)
-        # X, y = get_clean_Xy(tmp[:self.num_pre_train])
-        # self.clf.fit(X, y)
 
         self.y_pred = []
     
@@ -138,37 +169,41 @@ class MLStrategy(aio.Strategy):
         if bar_number < self.num_pre_train:
             return 
         
+        # get data from last 2 interval
         prepre_data = hist_data[bar_number-3]
         pre_data = hist_data[bar_number-2]
 
+        # get predict result by recognizing reversal candlestick pattern
         predict = det_candlestick_pattern(prepre_data, pre_data, bar_data)
-
-        # open, high, low, close = bar_data.open, bar_data.high, bar_data.low, bar_data.close
-        # X = get_X(bar_data)
-        # forecast = self.clf.predict([X])[0]
-        # self.y_pred.append(forecast)
-
-        # self.ctx.cplot(forecast,'Forcast')
-        # self.ctx.cplot(self.y[tick],'Groundtruth')
-        # # self.info(f"focasing result: {forecast}")
 
         close = bar_data.close
         upper, lower = close * (1 + np.r_[1, -1]*PCT_CHANGE)
-
+        bb_upper = bar_data.bb_upper
+        bb_lower = bar_data.bb_lower
+        rsi = bar_data.rsi
         cash = self.ctx.available_cash
 
-        # if forecast == 1 and not self.ctx.get_position(self.code):
-        if predict == 'BULL' and not self.ctx.get_position(self.code):
+
+        # call buy order if 
+        # there is a Bullish reversal pattern or
+        # RSI value larger than or equal to 0.65   
+        if (((predict == 'BULL')
+        or (rsi >= 0.65)) 
+        and not self.ctx.get_position(self.code)):
             amount = cash if (cash < 55800) else 55800
             o1 = self.order_amount(code=self.code,amount=amount,side=SideType.BUY, asset_type='Crypto')
             self.info(f"BUY order {o1['id']} created #{o1['quantity']} @ {close:2f}")
             osl = self.sell(code=self.code,quantity=o1['quantity'], stop_price=lower, asset_type='Crypto')
             self.info(f"STOPLOSS order {osl['id']} created #{osl['quantity']} @ {lower:2f}")
-            # os2 = self.sell(code=self.code,quantity=o1['quantity'], price=upper, asset_type='Crypto')
-            # self.info(f"STOPGAIN order {os2['id']} created #{os2['quantity']} @ {upper:2f}")
-            
-        # elif forecast == -1 and self.ctx.get_position(self.code):
-        elif predict == 'BEAR' and self.ctx.get_position(self.code):
+
+        # call sell order if
+        # there is a Bearish reversal pattern or
+        # price have touched the bollinger band or
+        # RSI value smaller than or equal to 0.35   
+        elif (((predict == 'BEAR')
+        or (close > bb_upper or close < bb_lower) 
+        or (rsi <= 0.35)) 
+        and self.ctx.get_position(self.code)):
             quantity = self.ctx.get_position(self.code)['quantity']
             o2 = self.sell(code=self.code, quantity=quantity, price=close, ioc=True, asset_type='Crypto')
             self.info(f"SELL order {o2['id']} created #{o2['quantity']} @ {close:2f}")
