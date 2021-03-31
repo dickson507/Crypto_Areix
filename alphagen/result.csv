@@ -3,16 +3,16 @@ start,2020-09-01 00:00:00+08:00
 end,2021-03-12 00:00:00+08:00
 duration,192 days 00:00:00
 beginning_balance,55800
-ending_balance,152657.536821
-total_net_profit,96857.53682099999
-gross_profit,670655.9891330001
-gross_loss,-573798.4523120001
-profit_factor,1.1688006240357272
-return_on_initial_capital,1.7357981509139782
-annualized_return,0.027947657241838675
-total_return,1.7357981509139782
-max_return,1.8981486599283153
-min_return,-0.02247512388888877
+ending_balance,271919.13641499996
+total_net_profit,216119.13641499996
+gross_profit,1844104.2849610003
+gross_loss,-1627985.1485460002
+profit_factor,1.1327525233310771
+return_on_initial_capital,3.8731028031362
+annualized_return,0.044330216982868986
+total_return,3.8731028031362
+max_return,4.746216166756272
+min_return,-0.02463259448028672
 number_trades,1069
 number_winning_trades,306
 number_losing_trades,177
@@ -21,38 +21,38 @@ avg_weekly_trades,44.541666666666664
 avg_monthly_trades,178.16666666666666
 win_ratio,0.2862488306828812
 loss_ratio,0.16557530402245088
-win_days,108
-loss_days,49
-max_win_in_day,16980.309214
-max_loss_in_day,-5999.266219
+win_days,107
+loss_days,50
+max_win_in_day,57283.799325
+max_loss_in_day,-15615.153648
 max_consecutive_win_days,38
 max_consecutive_loss_days,4
-avg_profit_per_trade,1755.931658059322
+avg_profit_per_trade,4114.029925005297
 trading_period,0 years 6 months 11 days
-avg_daily_pnl($),10.52799313271739
-avg_daily_pnl,0.00011636871193032747
-avg_weekly_pnl($),3587.316178555555
-avg_weekly_pnl,0.041960430845389106
-avg_monthly_pnl($),16142.922803499998
-avg_monthly_pnl,0.21474991352621994
-avg_quarterly_pnl($),48428.76841049999
-avg_quarterly_pnl,0.656105647889855
-avg_annualy_pnl($),55615.856469999984
-avg_annualy_pnl,0.5731130816040828
-sharpe_ratio,-0.2504488961561528
-sortino_ratio,0.7975642657893804
-annualized_volatility,0.05939692015533369
-omega_ratio,3.5775287321456295e-05
-downside_risk,0.0367680908790698
-information_ratio,-0.011232771895117875
-beta,0.12189402197025156
-alpha,-0.9999523317197775
-calmar_ratio,0.2265597896418606
-tail_ratio,1.2379555797967579
-stability_of_timeseries,0.9091792174311378
-max_drawdown,0.12335665250227126
+avg_daily_pnl($),23.4912104798913
+avg_daily_pnl,0.0001964626097100248
+avg_weekly_pnl($),8004.412459814813
+avg_weekly_pnl,0.06884869331070087
+avg_monthly_pnl($),36019.85606916666
+avg_monthly_pnl,0.3850607134898305
+avg_quarterly_pnl($),108059.56820749998
+avg_quarterly_pnl,1.2263979778164382
+avg_annualy_pnl($),163833.95438799995
+avg_annualy_pnl,1.5157855250414785
+sharpe_ratio,0.04778549791633901
+sortino_ratio,0.70852154590542
+annualized_volatility,0.11109785210143595
+omega_ratio,0.0012875518705467296
+downside_risk,0.06987589570569687
+information_ratio,0.00031777248201458256
+beta,0.23974202037751752
+alpha,-0.9998111375363669
+calmar_ratio,0.20695346168384993
+tail_ratio,1.2835059389596708
+stability_of_timeseries,0.8986549048199247
+max_drawdown,0.21420379549190402
 max_drawdown_period,"(Timestamp('2020-11-24 13:30:00+0800', tz='pytz.FixedOffset(480)'), Timestamp('2020-11-25 05:30:00+0800', tz='pytz.FixedOffset(480)'))"
 max_drawdown_duration,0 days 16:00:00
-sqn,4.652380400318226
+sqn,4.047806305844272
 model_name,Parabolic SAR Trend prediction & Reversal Candlestick Pattern Recognition & RSI
 algorithm,"['Parabolic SAR', 'Reversal Candlestick Pattern', 'RSI', 'Bollinger Band']"
