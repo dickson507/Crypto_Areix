@@ -1,0 +1,58 @@
+,value
+start,2020-09-01 00:00:00+08:00
+end,2021-03-12 00:00:00+08:00
+duration,192 days 00:00:00
+beginning_balance,55800
+ending_balance,152657.536821
+total_net_profit,96857.53682099999
+gross_profit,670655.9891330001
+gross_loss,-573798.4523120001
+profit_factor,1.1688006240357272
+return_on_initial_capital,1.7357981509139782
+annualized_return,0.027947657241838675
+total_return,1.7357981509139782
+max_return,1.8981486599283153
+min_return,-0.02247512388888877
+number_trades,1069
+number_winning_trades,306
+number_losing_trades,177
+avg_daily_trades,9.136752136752136
+avg_weekly_trades,44.541666666666664
+avg_monthly_trades,178.16666666666666
+win_ratio,0.2862488306828812
+loss_ratio,0.16557530402245088
+win_days,108
+loss_days,49
+max_win_in_day,16980.309214
+max_loss_in_day,-5999.266219
+max_consecutive_win_days,38
+max_consecutive_loss_days,4
+avg_profit_per_trade,1755.931658059322
+trading_period,0 years 6 months 11 days
+avg_daily_pnl($),10.52799313271739
+avg_daily_pnl,0.00011636871193032747
+avg_weekly_pnl($),3587.316178555555
+avg_weekly_pnl,0.041960430845389106
+avg_monthly_pnl($),16142.922803499998
+avg_monthly_pnl,0.21474991352621994
+avg_quarterly_pnl($),48428.76841049999
+avg_quarterly_pnl,0.656105647889855
+avg_annualy_pnl($),55615.856469999984
+avg_annualy_pnl,0.5731130816040828
+sharpe_ratio,-0.2504488961561528
+sortino_ratio,0.7975642657893804
+annualized_volatility,0.05939692015533369
+omega_ratio,3.5775287321456295e-05
+downside_risk,0.0367680908790698
+information_ratio,-0.011232771895117875
+beta,0.12189402197025156
+alpha,-0.9999523317197775
+calmar_ratio,0.2265597896418606
+tail_ratio,1.2379555797967579
+stability_of_timeseries,0.9091792174311378
+max_drawdown,0.12335665250227126
+max_drawdown_period,"(Timestamp('2020-11-24 13:30:00+0800', tz='pytz.FixedOffset(480)'), Timestamp('2020-11-25 05:30:00+0800', tz='pytz.FixedOffset(480)'))"
+max_drawdown_duration,0 days 16:00:00
+sqn,4.652380400318226
+model_name,Parabolic SAR Trend prediction & Reversal Candlestick Pattern Recognition & RSI
+algorithm,"['Parabolic SAR', 'Reversal Candlestick Pattern', 'RSI', 'Bollinger Band']"
