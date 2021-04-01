@@ -1,7 +1,7 @@
 #Reference: http://www.diva-portal.org/smash/get/diva2:1114719/FULLTEXT01.pdf
 
 TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NDMyMDUxMTQsImlhdCI6MTYxMjEwMTA1NCwic3ViIjoiZjQzZyAzNWc1dzRoNXc0aCB3NDVoNXc0aHc0NWhqNXdqamh3NTRnIHc0NSBnNXc0ICJ9.CLavu4bIpl64So0F0nYl6g3NfmXqopLfS_UC-9wOgrA'
-START_DATE = '2020-09-01'
+START_DATE = '2020-12-01'
 END_DATE = '2021-03-12'
 INTERVAL = '30m'
 COMMISION = 0.001
@@ -194,7 +194,8 @@ class MLStrategy(aio.Strategy):
         # there is a Bullish reversal pattern or
         # RSI value larger than or equal to 0.65   
         if (((predict == 'BULL')
-        or (rsi >= 0.65)) 
+        or (rsi < 0.35)) 
+        and (close <= bb_upper or close >= bb_lower)
         and not self.ctx.get_position(self.code)):
             amount = cash # if (cash < 55800) else 55800
             o1 = self.order_amount(code=self.code,amount=amount,side=SideType.BUY, asset_type='Crypto')
@@ -208,7 +209,7 @@ class MLStrategy(aio.Strategy):
         # RSI value smaller than or equal to 0.35   
         elif (((predict == 'BEAR')
         or (close > bb_upper or close < bb_lower) 
-        or (rsi <= 0.35)) 
+        or (rsi > 0.65)) 
         and self.ctx.get_position(self.code)):
             quantity = self.ctx.get_position(self.code)['quantity']
             o2 = self.sell(code=self.code, quantity=quantity, price=close, ioc=True, asset_type='Crypto')
